@@ -1,0 +1,21 @@
+{
+  "name": "COMICVERSE — Baca Komik Terupdate",
+  "short_name": "COMICVERSE",
+  "description": "Ruang baca komik pribadi di sakumu. Ringan, tanpa iklan, tanpa loading lambat — favoritmu tersimpan aman di perangkat.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F5EFE6",
+  "theme_color": "#FF6B35",
+  "lang": "id",
+  "categories": ["books", "entertainment"],
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

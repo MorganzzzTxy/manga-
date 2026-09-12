@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>COMICVERSE — Baca Komik Terupdate</title>
+    <meta name="theme-color" content="#FF6B35">
+    <meta name="description" content="Baca komik terupdate, ringan, tanpa iklan. Favorit tersimpan lokal di perangkatmu.">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" href="./icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="./icon.svg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="COMICVERSE">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cream: '#F5EFE6',
+                        paper: '#FFFBF2',
+                        ink: '#0A0A0A',
+                        primary: '#FF6B35',
+                        secondary: '#FFB800'
+                    },
+                    fontFamily: {
+                        black: ['"Archivo Black"', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'brut-sm': '3px 3px 0 0 #0A0A0A',
+                        'brut': '4px 4px 0 0 #0A0A0A',
+                        'brut-lg': '6px 6px 0 0 #0A0A0A'
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Archivo+Black&display=swap" rel="stylesheet">
+    <style>
+        /* ============ INTRO ============ */
+        .intro-screen {
+            position: fixed; inset: 0; background: #F5EFE6;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999;
+            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s;
+            will-change: opacity, visibility;
+        }
+        .comic-bg {
+            position: absolute; inset: 0;
+            background-image: radial-gradient(#0A0A0A 1.5px, transparent 1.5px);
+            background-size: 22px 22px; opacity: 0.14;
+        }
+        .speed-lines {
+            position: absolute; inset: -50%;
+            background: repeating-conic-gradient(from 0deg,
+                transparent 0deg 12deg, rgba(255,107,53,0.10) 12deg 20deg);
+            animation: spin 14s linear infinite; will-change: transform;
+        }
+        .logo-wrapper {
+            position: relative; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 2rem; width: 100%; max-width: 600px;
+        }
+        .burst-bg {
+            position: absolute; width: 108%; height: 130%;
+            background: #FF6B35; border: 4px solid #0A0A0A; border-radius: 14px;
+            box-shadow: 8px 8px 0 0 #0A0A0A;
+            transform: scale(0) rotate(-6deg);
+            animation: burstIn 0.5s 0.15s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        .logo-text {
+            position: relative; font-family: 'Archivo Black', sans-serif;
+            font-size: clamp(2rem, 10vw, 5rem); text-transform: uppercase;
+            color: #0A0A0A; line-height: 1; letter-spacing: -2px;
+            transform: skewX(-4deg); white-space: nowrap;
+        }
+        .logo-text span {
+            display: inline-block; opacity: 0;
+            transform: translate3d(0,30px,0) scale(0.6) rotate(8deg);
+            animation: letterDrop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        .tagline {
+            position: relative; margin-top: 1.2rem;
+            background: #0A0A0A; color: #FF6B35;
+            padding: 0.45rem 1.1rem; font-size: clamp(0.7rem, 3vw, 0.95rem);
+            letter-spacing: 2.5px; font-weight: 800;
+            border: 3px solid #0A0A0A; border-radius: 8px;
+            box-shadow: 5px 5px 0 0 #FF6B35;
+            transform: translateY(10px) scale(0); opacity: 0;
+            animation: tagPop 0.4s 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            white-space: nowrap;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes burstIn { 0% { transform: scale(0) rotate(-12deg); } 100% { transform: scale(1) rotate(-4deg); } }
+        @keyframes letterDrop { 0% { opacity:0; transform: translate3d(0,30px,0) scale(.6) rotate(8deg);} 100% { opacity:1; transform: translate3d(0,0,0) scale(1) rotate(0);} }
+        @keyframes tagPop { 0% { opacity:0; transform: translateY(10px) scale(.6) rotate(-3deg);} 100% { opacity:1; transform: translateY(0) scale(1) rotate(2deg);} }
+        .intro-screen.fade-out { opacity: 0; visibility: hidden; }
+
+        /* ============ BASE ============ */
+        body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; overscroll-behavior-y: contain; }
+
+        /* ============ HORIZONTAL SCROLL FIX ============ */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+        .h-scroll { touch-action: pan-x pan-y; overscroll-behavior-x: contain; scroll-snap-type: x proximity; }
+        .h-scroll > * { scroll-snap-align: start; }
+
+        /* ============ PERF ============ */
+        .cv-card { content-visibility: auto; contain-intrinsic-size: 0 112px; }
+        img { background-color: #EDE6D8; content-visibility: auto; }
+
+        /* ============ NAV BOUNCE (unik per ikon) ============ */
+        @keyframes bHome   { 0%,100%{transform:translateY(0) scale(1);}     50%{transform:translateY(-4px) scale(1.08);} }
+        @keyframes bSearch { 0%,100%{transform:rotate(0);}   25%{transform:rotate(-14deg);} 50%{transform:rotate(0);} 75%{transform:rotate(14deg);} }
+        @keyframes bFav    { 0%,100%{transform:scale(1);}     20%{transform:scale(1.18);}   40%{transform:scale(1);} 60%{transform:scale(1.18);} 80%{transform:scale(1);} }
+        @keyframes bGenre  { 0%,100%{transform:translateY(0) rotate(0);}  50%{transform:translateY(-4px) rotate(10deg);} }
+        @keyframes bDev    { 0%,100%{transform:translateX(0) scale(1);}   50%{transform:translateX(4px) scale(1.06);} }
+        @keyframes bInstall{ 0%,100%{transform:translateY(0) rotate(0);}  50%{transform:translateY(-3px) rotate(-8deg);} }
+        .nav-btn[data-path="home"]     svg { animation: bHome   2.2s ease-in-out infinite; }
+        .nav-btn[data-path="search"]   svg { animation: bSearch 3.0s ease-in-out infinite; }
+        .nav-btn[data-path="favorite"] svg { animation: bFav    2.0s ease-in-out infinite; }
+        .nav-btn[data-path="genres"]   svg { animation: bGenre  2.4s ease-in-out infinite; }
+        .nav-btn[data-path="developer"]svg { animation: bDev    2.6s ease-in-out infinite; }
+        #install-btn-header svg { animation: bInstall 1.8s ease-in-out infinite; }
+
+        /* ============ TOAST ============ */
+        @keyframes toastIn  { from { opacity:0; transform: translateY(-12px) scale(.9);} to { opacity:1; transform: translateY(0) scale(1);} }
+        @keyframes toastOut { to   { opacity:0; transform: translateY(-8px) scale(.9);} }
+
+        /* ============ AVATAR RING (dev page) ============ */
+        @keyframes ringSpin { to { transform: rotate(360deg); } }
+        .avatar-ring { animation: ringSpin 9s linear infinite; }
+
+        /* ============ PAGE TRANSITION (auto via JS) ============ */
+        @keyframes pageIn {
+            0%   { opacity: 0; transform: translateY(28px) scale(0.92) rotate(-1deg); }
+            55%  { opacity: 1; transform: translateY(-6px) scale(1.03) rotate(0.5deg); }
+            100% { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
+        }
+        @keyframes cardIn {
+            0%   { opacity: 0; transform: translateY(14px) scale(0.9); }
+            60%  { opacity: 1; transform: translateY(-3px) scale(1.02); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Press micro-feedback */
+        .pressable { transition: transform .08s cubic-bezier(.34,1.56,.64,1); }
+        .pressable:active { transform: scale(.94); }
+
+        /* Card hover lift */
+        .cv-card { transition: transform .15s ease, box-shadow .15s ease; }
+        .cv-card:hover { transform: translate(-1px, -1px); }
+
+        @media (max-width: 480px) {
+            .logo-wrapper { padding: 1rem; }
+            .burst-bg { width: 104%; height: 124%; }
+            .logo-text { letter-spacing: -1px; }
+        }
+    </style>
+</head>
+<body class="bg-cream text-ink min-h-screen flex flex-col antialiased pb-28">
+
+    <!-- Intro -->
+    <div class="intro-screen" id="introScreen">
+        <div class="comic-bg"></div>
+        <div class="speed-lines"></div>
+        <div class="logo-wrapper">
+            <div class="burst-bg"></div>
+            <h1 class="logo-text" id="logoText">COMICVERSE</h1>
+            <div class="tagline">ENTER THE MULTIVERSE</div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="sticky top-0 z-40 bg-cream border-b-[3px] border-ink px-4 py-3">
+        <div class="max-w-4xl mx-auto flex items-center justify-between gap-2">
+            <!-- Brand -->
+            <div class="flex items-center gap-2 cursor-pointer select-none shrink-0" id="brand-logo" title="Tap 5x untuk easter egg">
+                <div class="w-8 h-8 bg-primary border-2 border-ink rounded-lg shadow-brut-sm flex items-center justify-center">
+                    <svg class="w-4 h-4 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                </div>
+                <span class="font-black text-base tracking-tight">COMIC<span class="text-primary">VERSE</span></span>
+            </div>
+
+            <!-- Right: context + install pill -->
+            <div class="flex items-center gap-2 min-w-0">
+                <div id="top-nav-context" class="text-xs text-ink/70 font-semibold truncate max-w-[100px] sm:max-w-[200px]"></div>
+
+                <button data-install-btn id="install-btn-header"
+                    class="hidden items-center gap-1.5 bg-primary border-2 border-ink rounded-full shadow-brut-sm px-3.5 py-1.5 active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all pressable">
+                    <svg class="w-3.5 h-3.5 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.6" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 3v13m0 0l-4-4m4 4l4-4"></path>
+                    </svg>
+                    <span class="text-[10px] font-black tracking-wide text-ink uppercase">Install App</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- App Root -->
+    <main id="app-root" class="flex-grow max-w-4xl mx-auto w-full px-4 py-6">
+        <!-- Injected -->
+    </main>
+
+    <!-- Floating Bottom Nav -->
+    <nav class="fixed bottom-3 left-3 right-3 z-50">
+        <div class="max-w-md mx-auto bg-cream border-[3px] border-ink rounded-2xl shadow-brut-lg px-1.5 py-1.5 flex items-stretch gap-0.5">
+            <a href="#home" class="nav-btn flex flex-col items-center justify-center flex-1 text-primary py-1 rounded-xl hover:bg-primary/10 transition-colors pressable" data-path="home">
+                <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                <span class="text-[9px] font-black tracking-wide">Home</span>
+            </a>
+            <a href="#search" class="nav-btn flex flex-col items-center justify-center flex-1 text-ink/50 py-1 rounded-xl hover:bg-primary/10 transition-colors pressable" data-path="search">
+                <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <span class="text-[9px] font-black tracking-wide">Search</span>
+            </a>
+            <a href="#favorite" class="nav-btn flex flex-col items-center justify-center flex-1 text-ink/50 py-1 rounded-xl hover:bg-primary/10 transition-colors pressable" data-path="favorite">
+                <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                <span class="text-[9px] font-black tracking-wide">Fav</span>
+            </a>
+            <a href="#genres" class="nav-btn flex flex-col items-center justify-center flex-1 text-ink/50 py-1 rounded-xl hover:bg-primary/10 transition-colors pressable" data-path="genres">
+                <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
+                <span class="text-[9px] font-black tracking-wide">Genre</span>
+            </a>
+            <a href="#developer" class="nav-btn flex flex-col items-center justify-center flex-1 text-ink/50 py-1 rounded-xl hover:bg-primary/10 transition-colors pressable" data-path="developer">
+                <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                <span class="text-[9px] font-black tracking-wide">Dev</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Intro controller -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const logo = document.getElementById('logoText');
+            if (logo) {
+                const text = logo.textContent;
+                logo.textContent = '';
+                const frag = document.createDocumentFragment();
+                [...text].forEach((ch, i) => {
+                    const s = document.createElement('span');
+                    s.textContent = ch;
+                    s.style.animationDelay = `${0.25 + (i * 0.04)}s`;
+                    frag.appendChild(s);
+                });
+                logo.appendChild(frag);
+                setTimeout(() => document.getElementById('introScreen')?.classList.add('fade-out'), 3000);
+            }
+        });
+    </script>
+
+    <script src="app.js"></script>
+</body>
+</html>
